@@ -1,15 +1,10 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer
-      v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      fixed
-      app
-    >
+    <v-navigation-drawer v-model="drawer" temporary app>
       <v-list>
         <v-list-item
           v-for="(item, i) in items"
+          v-show="!item.requiresAuth || auth.loggedIn"
           :key="i"
           :to="item.to"
           router
@@ -24,94 +19,127 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar
-      :clipped-left="clipped"
-      fixed
-      app
-    >
+    <v-app-bar color="primary" dark fixed flat app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-btn
-        icon
-        @click.stop="miniVariant = !miniVariant"
+      <v-toolbar-title>{{ title }}</v-toolbar-title>
+      <div v-if="$route.name === 'agent-id'" class="projects mx-sm-10">
+        <v-select
+          :items="projects"
+          :value="$route.params['id']"
+          @change="redirect"
+          item-value="id"
+          item-text="name"
+          label="Proyecto"
+          dense
+          hide-details
+          outlined
+        ></v-select>
+      </div>
+      <v-spacer></v-spacer>
+      <v-btn v-if="auth.loggedIn" @click="userLogout()" text
+        >Cerrar Sesión</v-btn
       >
-        <v-icon>mdi-{{ `chevron-${miniVariant ? 'right' : 'left'}` }}</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="clipped = !clipped"
-      >
-        <v-icon>mdi-application</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="fixed = !fixed"
-      >
-        <v-icon>mdi-minus</v-icon>
-      </v-btn>
-      <v-toolbar-title v-text="title" />
-      <v-spacer />
-      <v-btn
-        icon
-        @click.stop="rightDrawer = !rightDrawer"
-      >
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
+      <v-btn v-else to="/login" text>Iniciar Sesión</v-btn>
     </v-app-bar>
-    <v-main>
-      <v-container>
-        <nuxt />
-      </v-container>
+    <v-main class="main">
+      <nuxt />
     </v-main>
-    <v-navigation-drawer
-      v-model="rightDrawer"
-      :right="right"
-      temporary
-      fixed
-    >
-      <v-list>
-        <v-list-item @click.native="right = !right">
-          <v-list-item-action>
-            <v-icon light>
-              mdi-repeat
-            </v-icon>
-          </v-list-item-action>
-          <v-list-item-title>Switch drawer (click me)</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-footer
-      :absolute="!fixed"
-      app
-    >
-      <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer>
+
+    <globals-loader v-model="loader" :text="loader_text" class="loader" />
+    <globals-message
+      v-model="message"
+      :title="message_data.title"
+      :text="message_data.text"
+    />
   </v-app>
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
-  data () {
-    return {
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      items: [
+  data: () => ({
+    drawer: false,
+    items: [
+      {
+        icon: "mdi-home",
+        title: "Inicio",
+        to: "/",
+      },
+      {
+        icon: "mdi-robot",
+        title: "Proyectos",
+        to: "/agent",
+        requiresAuth: true,
+      },
+    ],
+    title: "Braintutor",
+  }),
+  computed: {
+    ...mapState(["auth", "loader", "loader_text", "message_data", "agents"]),
+    message: {
+      get() {
+        return this.$store.state.message;
+      },
+      set(value) {
+        this.$store.commit("setMessage", value);
+      },
+    },
+    projects() {
+      return [
         {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/'
+          id: "all",
+          name: "Ver todos los proyectos",
         },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
-        }
-      ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'Vuetify.js'
-    }
-  }
-}
+        ...this.agents,
+      ];
+    },
+  },
+  methods: {
+    async userLogout() {
+      try {
+        await this.$auth.logout();
+        this.$router.push("/login");
+      } catch (error) {
+        //
+      }
+    },
+    redirect(id) {
+      if (id === "all") this.$router.push(`/agent`);
+      else this.$router.push(`/agent/${id}`);
+    },
+  },
+};
 </script>
+
+<style lang="scss" scoped>
+.main {
+  height: calc(100vh - 65px);
+  overflow: auto;
+}
+
+.projects {
+  width: 240px;
+}
+
+.loader {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+</style>
+
+<style>
+html {
+  overflow: hidden !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+</style>
