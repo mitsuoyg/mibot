@@ -9,8 +9,8 @@ export default {
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - mibot',
-    title: 'mibot',
+    titleTemplate: '%s',
+    title: 'Mibot',
     htmlAttrs: {
       lang: 'es'
     },
