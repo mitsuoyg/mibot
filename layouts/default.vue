@@ -73,7 +73,7 @@ export default {
         requiresAuth: true,
       },
     ],
-    title: "Braintutor",
+    title: "Mibot",
   }),
   computed: {
     ...mapState(["auth", "loader", "loader_text", "message_data", "agents"]),

@@ -11,7 +11,7 @@
         <h3>Preguntas</h3>
         <p class="mt-2">
           Cuando un usuario dice algo similar a una de las siguientes preguntas,
-          Braintutor lo detectará automáticamente. No es necesario crear una
+          Mibot lo detectará automáticamente. No es necesario crear una
           lista exhaustiva.
         </p>
         <div class="mt-3">
@@ -65,7 +65,7 @@
         <h3>Respuestas</h3>
         <p class="mt-2">
           La respuesta es lo que el bot responderá al usuario final. Si hay más
-          de una respuesta, Braintutor seleccionará una de ellas de manera
+          de una respuesta, Mibot seleccionará una de ellas de manera
           aleatoria.
         </p>
         <div>

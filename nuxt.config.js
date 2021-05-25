@@ -55,7 +55,7 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // baseURL: 'http://localhost:5000/api'
-    baseURL: 'https://braintutor-chatbot-test.herokuapp.com/api'
+    baseURL: 'https://mibot-service.herokuapp.com/api'
   },
 
   // Auth
